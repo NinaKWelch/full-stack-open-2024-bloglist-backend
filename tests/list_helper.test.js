@@ -9,7 +9,6 @@ const blogs = [
     author: "Edsger W. Dijkstra",
     url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
     likes: 5,
-    __v: 0
   },
   {
     _id: "5a422b891b54a676234d17fa",
@@ -17,7 +16,6 @@ const blogs = [
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
     likes: 10,
-    __v: 0
   },
   {
     _id: "5a422bc61b54a676234d17fc",
@@ -25,7 +23,6 @@ const blogs = [
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     likes: 15,
-    __v: 0
   }  
 ]
 
@@ -80,5 +77,25 @@ describe('favorite blog', () => {
       author: blogs[2].author,
       likes: blogs[2].likes
     })
+  })
+})
+
+describe('most blogs', () => {
+  test('of empty list is null', () => {
+    const result = listHelper.mostBlogs([])
+
+    assert.strictEqual(result, null)
+  })
+
+  test('when list has only one blog, equals the author of that blog', () => {
+    const result = listHelper.mostBlogs([blogs[0]])
+
+    assert.deepStrictEqual(result, { author: 'Edsger W. Dijkstra', blogs: 1 })
+  })
+
+  test('of a bigger list is the author with most blogs', () => {
+    const result = listHelper.mostBlogs(blogs)
+
+    assert.deepStrictEqual(result, { author: 'Robert C. Martin', blogs: 2 })
   })
 })
