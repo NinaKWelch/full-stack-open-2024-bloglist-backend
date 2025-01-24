@@ -1,30 +1,20 @@
 const { test, after, beforeEach } = require('node:test')
 const assert = require('node:assert')
-const mongoose = require('mongoose')
 const supertest = require('supertest')
+const mongoose = require('mongoose')
+const helper = require('./test_helper')
 const app = require('../app')
 const Blog = require('../models/blog')
 
 const api = supertest(app)
 
-const initialBlogs = [
-  {
-    title: 'First Blog',
-    author: 'John',
-    url: 'http://john.com',
-  },
-  {
-    title: 'Second Blog',
-    author: 'Jill',
-    url: 'http://jill.com',
-  }
-]
-
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(initialBlogs[0])
+
+  let blogObject = new Blog(helper.initialBlogs[0])
   await blogObject.save()
-  blogObject = new Blog(initialBlogs[1])
+
+  blogObject = new Blog(helper.initialBlogs[1])
   await blogObject.save()
 })
 
@@ -36,23 +26,23 @@ test('blogs are returned as json', async () => {
 })
 
 test('there are two blogs', async () => {
-  const res = await api.get('/api/blogs')
-  
-  assert.strictEqual(res.body.length, 2)
+  await api.get('/api/blogs')
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
 })
 
-test('blog has an id property', async () => {
-  const res = await api.get('/api/blogs')
-  
-  assert(res.body[0].id)
+test('blogs have an id property', async () => {
+  await api.get('/api/blogs')
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  blogsAtEnd.forEach(blog => assert(blog.id))
 })
 
 test('a valid blog can be added ', async () => {
-  const newBlog = {
-    title: 'Third Blog',
-    author: 'Jack',
-    url: 'http://jack.com',
-  }
+  const newBlog = { ...helper.blog, likes: 0 }
 
   await api
     .post('/api/blogs')
@@ -60,17 +50,31 @@ test('a valid blog can be added ', async () => {
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
-  const res = await api.get('/api/blogs')
+  await api.get('/api/blogs')
 
-  const blogs = res.body
-  const savedBlog = blogs.find(blog => blog.title === 'Third Blog')
+  const blogsAtEnd = await helper.blogsInDb()
+  const savedBlog = blogsAtEnd.at(-1)
 
   newBlog.id = savedBlog.id
 
-  assert.strictEqual(blogs.length, initialBlogs.length + 1)
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
   assert.deepStrictEqual(savedBlog, newBlog)
 })
 
+test('likes default to 0', async () => {
+  await api
+    .post('/api/blogs')
+    .send(helper.newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  await api.get('/api/blogs')
+
+  const blogsAtEnd = await helper.blogsInDb()
+  const savedBlog = blogsAtEnd.at(-1)
+
+  assert.strictEqual(savedBlog.likes, 0)
+})
 
 after(async () => {
   await mongoose.connection.close()
