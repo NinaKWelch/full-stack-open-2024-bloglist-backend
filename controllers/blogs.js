@@ -9,6 +9,11 @@ blogsRouter.get('/', async (_req, res) => {
 
 blogsRouter.post('/', async (req, res) => {
   const body = req.body
+
+  if (!body.title || !body.url) {
+    return res.status(400).json({ error: 'title and url are required' })
+  }
+
   const blog = new Blog(body)
 
   blog.likes = blog.likes || 0

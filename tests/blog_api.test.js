@@ -64,7 +64,7 @@ test('a valid blog can be added ', async () => {
 test('likes default to 0', async () => {
   await api
     .post('/api/blogs')
-    .send(helper.newBlog)
+    .send(helper.blog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
@@ -74,6 +74,18 @@ test('likes default to 0', async () => {
   const savedBlog = blogsAtEnd.at(-1)
 
   assert.strictEqual(savedBlog.likes, 0)
+})
+
+test('title and url are required', async () => {
+  await api
+    .post('/api/blogs')
+    .send({ author: 'John' })
+    .expect(400)
+
+  await api
+    .post('/api/blogs')
+    .send({ title: 'First Blog' })
+    .expect(400)
 })
 
 after(async () => {
