@@ -5,12 +5,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
     required: true,
-    minlength: 3
+    minlength: [3, 'username is shorter than the minimum allowed length']
   },
   name: String,
   passwordHash: {
     type: String,
-    required: true
+    required: true,
+    minlength: 3
   },
 })
 
