@@ -1,5 +1,4 @@
 const blogsRouter = require('express').Router()
-const blog = require('../models/blog')
 const Blog = require('../models/blog')
 
 blogsRouter.get('/', async (_req, res) => {
@@ -24,9 +23,7 @@ blogsRouter.post('/', async (req, res) => {
     return res.status(400).json({ error: 'title and url are required' })
   }
 
-  const blog = new Blog(body)
-
-  blog.likes = blog.likes || 0
+  const blog = new Blog({...body, likes: body.likes || 0})
 
   const savedBlog = await blog.save()
   res.status(201).json(savedBlog)
