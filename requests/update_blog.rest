@@ -1,0 +1,12 @@
+PUT http://localhost:3003/api/blogs/63cebadc20f007a72ae55256
+Content-Type: application/json
+
+{
+  "likes": 2,
+  "comments": [],
+  "title": "How To Use TypeScript to Avoid Bugs",
+  "author": "John Au-Yeung",
+  "url": "https://betterprogramming.pub/how-to-use-typescript-to-avoid-bugs-3d760435e243",
+  "user": "63ceb90120f007a72ae55227",
+  "id": "63cebadc20f007a72ae55256"
+}

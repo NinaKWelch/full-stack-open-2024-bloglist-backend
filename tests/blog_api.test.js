@@ -82,7 +82,7 @@ describe('when there are some blogs saved initially', () => {
     })
   })
 
-    describe('viewing a specific blog', () => {
+  describe('viewing a specific blog', () => {
     test('succeeds with a valid id', async () => {
       const blogsAtStart = await helper.blogsInDb()
       const blogToView = blogsAtStart.at(0)
@@ -121,7 +121,23 @@ describe('when there are some blogs saved initially', () => {
     })
   })
 
+  describe('updating a blog', () => {
+    test('succeeds with a valid id', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToUpdate = blogsAtStart.at(0)
+      const updatedBlog = { ...blogToUpdate, likes: 2 }
 
+      await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedBlog)
+        .expect(200)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      const savedBlog = blogsAtEnd.at(0)
+
+      assert.strictEqual(savedBlog.likes, 2)
+    })
+  })
 })
 
 after(async () => {
